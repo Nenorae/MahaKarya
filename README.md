@@ -1,8 +1,3 @@
-
-
----
-
-````md
 # 📖 Buku Panduan & Alur Kerja Tim Proyek MahaKarya
 
 Selamat datang di tim! Dokumen ini adalah **"Kitab Suci"** kita.
@@ -22,7 +17,7 @@ Semua anggota tim **WAJIB** membaca dan mengikuti aturan ini.
 Kita **HANYA** menggunakan **Laravel Sail (Docker)**.  
 Dilarang memakai Herd, Valet, XAMPP, Laragon, atau environment lainnya.
 
-Alasan:  
+**Alasan:**  
 Lingkungan Sail menjamin semua device identik dan bebas bug *“di laptop saya jalan”*.
 
 ### **2. `main` Adalah Sakral**
@@ -56,12 +51,13 @@ Kode tidak boleh masuk `main` sebelum:
 
 ### 🐧 **Untuk Pengguna Ubuntu (Linux)**
 
-Disarankan membuat alias Sail (lihat `MahaKarya-Setup-Guide.md` langkah 6).
+Disarankan membuat alias Sail (lihat `MahaKarya-Setup-Guide.md`, langkah 6).
 
 Menyalakan lingkungan:
+
 ```bash
 sail up -d
-````
+```
 
 Menjalankan perintah:
 
@@ -82,9 +78,8 @@ sail down
 ### 🪟 **Untuk Pengguna Windows**
 
 **Prasyarat wajib:**
-
-* Docker Desktop **harus** menyala.
-* Laravel Herd **harus dimatikan** (Herd berebut port 80 & 3306 dengan Sail).
+- Docker Desktop **harus** menyala
+- Laravel Herd **harus dimatikan** (Herd berebut port 80 & 3306 dengan Sail)
 
 Menyalakan lingkungan:
 
@@ -142,17 +137,15 @@ git checkout -b <nama-branch-anda>
 ```
 
 **Format penamaan branch (WAJIB):**
-
-* Fitur baru → `fitur/<deskripsi-singkat>`
-* Perbaikan bug → `perbaikan/<deskripsi-singkat>`
-* Refaktor → `refaktor/<deskripsi-singkat>`
+- Fitur baru → `fitur/<deskripsi-singkat>`
+- Perbaikan bug → `perbaikan/<deskripsi-singkat>`
+- Refaktor → `refaktor/<deskripsi-singkat>`
 
 Contoh:
-
-* `fitur/crud-portfolio`
-* `fitur/halaman-profil-publik`
-* `perbaikan/validasi-login`
-* `refaktor/profile-controller`
+- `fitur/crud-portfolio`
+- `fitur/halaman-profil-publik`
+- `perbaikan/validasi-login`
+- `refaktor/profile-controller`
 
 ---
 
@@ -166,13 +159,12 @@ git add .
 git commit -m "Tambah validasi untuk form portofolio"
 ```
 
-**Format pesan commit yang benar:**
-
-* ✔️ Tambah validasi untuk form portofolio
-* ✔️ Perbaiki tampilan tombol hapus skill
-* ❌ wip
-* ❌ beberapa perbaikan
-* ❌ fix
+**Contoh commit yang benar:**
+- ✔️ Tambah validasi untuk form portofolio  
+- ✔️ Perbaiki tampilan tombol hapus skill  
+- ❌ wip  
+- ❌ beberapa perbaikan  
+- ❌ fix  
 
 ---
 
@@ -206,81 +198,64 @@ git push
 ### **Langkah 6: Review & Merge**
 
 #### Untuk Reviewer:
-
-* Buka PR → tab **Files changed**
-* Jika ada masalah → beri komentar
-* Jika sudah oke → **Approve**
+- Buka PR → tab **Files changed**
+- Jika ada masalah → beri komentar
+- Jika sudah oke → **Approve**
 
 #### Untuk Pembuat PR (Setelah Approved):
-
-* Klik **Squash and merge**
-* Klik **Confirm**
-* Klik **Delete branch**
+- Klik **Squash and merge**
+- Klik **Confirm**
+- Klik **Delete branch**
 
 ---
 
 ## 4. 👥 Pembagian Tugas Awal (Vertical Slices)
 
 ### **Person 1 — Lead / Arsitek**
-
 **Nama:** `[Isi Nama Anda]`
 
 **Tugas Inti:**
-
-* Membuat semua file Migration & Model (Profile, Portfolio, Skill, skill_user)
-* Menentukan relasi antar Model
-* Modifikasi halaman Profil bawaan Jetstream (bio, jurusan, angkatan)
+- Membuat semua file Migration & Model (Profile, Portfolio, Skill, skill_user)
+- Menentukan relasi antar Model
+- Modifikasi halaman Profil bawaan Jetstream (bio, jurusan, angkatan)
 
 **Tanggung Jawab:**
-
-* Menjaga branch `main`
-* Final merge semua PR
-* Memastikan migrasi berjalan
+- Menjaga branch `main`
+- Final merge semua PR
+- Memastikan migrasi berjalan
 
 ---
 
 ### **Person 2 — Fitur Portofolio**
-
 **Nama:** `[Isi Nama Anggota 1]`
 
 **Tugas Inti:**
-
-* Membuat Livewire Component `ManagePortfolios`
-* CRUD lengkap Portofolio
-* File Upload gambar portofolio (WithFileUploads)
+- Membuat Livewire Component `ManagePortfolios`
+- CRUD lengkap Portofolio
+- File Upload gambar portofolio (WithFileUploads)
 
 **Tanggung Jawab:**
-
-* Fitur portofolio dari A-Z
+- Fitur portofolio dari A-Z
 
 ---
 
 ### **Person 3 — Fitur Publik & Keahlian**
-
 **Nama:** `[Isi Nama Anggota 2]`
 
 **Tugas Inti:**
-
-* Membuat Livewire `ManageSkills` (Many-to-Many CRUD)
-* Membuat `PublicProfileController`
-* Membuat halaman profil publik (`/username`) untuk menampilkan:
-
-  * bio
-  * portfolio
-  * skills
+- Membuat Livewire `ManageSkills` (Many-to-Many CRUD)
+- Membuat `PublicProfileController`
+- Membuat halaman profil publik (`/username`) untuk menampilkan:
+  - bio
+  - portfolio
+  - skills
 
 **Tanggung Jawab:**
-
-* Tampilan publik & fitur skill
+- Tampilan publik & fitur skill
 
 ---
 
-### 🎉 Selesai!
+## 🎉 Selesai!
 
-Dokumen ini akan terus diperbarui seiring bertambahnya fitur.
-
+Dokumen ini akan terus diperbarui seiring bertambahnya fitur.  
 Patuhilah panduan ini — demi workflow yang sehat, kode yang bersih, dan tim yang bahagia.
-
-```
-
-
