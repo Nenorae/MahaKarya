@@ -262,6 +262,121 @@ git push
 
 ---
 
+## 5. 📋 Daftar Fitur Wajib (Functional Requirements)
+
+Kita bagi menjadi dua sisi: Panel Admin (Dashboard User) dan Sisi Publik (Pengunjung).
+
+### **A. Sisi Dashboard (Area Login User)**
+Ini adalah tempat "dapur" di mana user mengelola konten mereka.
+
+#### **Autentikasi & Keamanan**
+- ✅ Login, Register, Logout (bisa pakai Laravel Breeze/Jetstream)
+- ✅ Reset Password (penting jika user lupa sandi)
+
+#### **Manajemen Profil Diri**
+- ✅ Update Avatar (foto profil)
+- ✅ Update Bio Ringkas, Jurusan, Angkatan, Link Sosmed (LinkedIn, GitHub)
+
+#### **Manajemen Portofolio (CRUD)**
+- ✅ **Create**: Upload thumbnail gambar, judul, deskripsi, link demo/repo
+- ✅ **Read**: Melihat daftar portofolio sendiri dalam bentuk tabel/grid
+- ✅ **Update**: Edit salah satu data jika ada typo
+- ✅ **Delete**: Hapus portofolio yang sudah usang
+
+#### **Manajemen Skill (Tagging System)**
+- ✅ Menambah skill (misal: "Laravel", "Flutter", "Cisco")
+- ✅ Sistem autocomplete (agar tidak ada user menulis "ReactJS" dan "React.js" sebagai dua hal berbeda)
+
+### **B. Sisi Publik (Halaman Profil)**
+Ini adalah "etalase" yang akan dilihat orang lain.
+
+#### **Landing Page Sederhana**
+- ✅ Halaman depan yang menjelaskan "Apa itu MahaKarya?"
+- ⚠️ (Opsional) Daftar user terbaru atau fitur pencarian mahasiswa
+
+#### **Halaman Detail Profil (The "MahaKarya" Page)**
+- ✅ URL yang cantik: `mahakarya.test/u/ganendra` (bukan `mahakarya.test/user/12`)
+- ✅ Header berisi Foto, Nama, Jurusan, dan Bio
+- ✅ Daftar Skill (tampil sebagai badges atau pills)
+- ✅ Grid Portofolio: Tampilan kartu-kartu proyek yang rapi
+- ✅ Detail Proyek (Modal/Page): Saat kartu diklik, muncul detail lengkap + gambar besar
+
+---
+
+## 6. 🛠️ Langkah Realisasi Teknis (Technical Roadmap)
+
+Berdasarkan pembagian tim yang sudah Anda buat sebelumnya, berikut adalah aset teknis yang harus dibuat coding-nya.
+
+### **Tahap 1: Database & Model (Fondasi)**
+**Oleh Person 1 (Database Architect)**
+
+Kita perlu membuat "wadah" datanya dulu.
+
+**ERD (Entity Relationship Diagram):** Pastikan relasi tabel benar
+```
+users 1 --- 1 profiles
+users 1 --- N portfolios  
+users N --- N skills (pakai pivot table skill_user)
+```
+
+**Factory & Seeder:** Buat data palsu (dummy data) sebanyak 10 user lengkap dengan portofolio. Ini PENTING agar Person 3 bisa mendesain tampilan tanpa menunggu Person 2 selesai membuat fitur input.
+
+### **Tahap 2: Backend Logic & Dashboard**
+**Oleh Person 2 (Backend/CRUD)**
+
+Fokus membuat fitur agar data bisa masuk ke database.
+
+**Route Grouping:** Pisahkan route publik dan route yang butuh login (`middleware('auth')`)
+
+**Image Handling (Laravel Storage):**
+- Setting `config/filesystems.php`
+- Pastikan folder `storage/app/public` bisa diakses (`php artisan storage:link`)
+
+**Livewire Components:**
+- `CreatePortfolio.php` (Form input + upload gambar)
+- `ListPortfolio.php` (Tabel manajemen + tombol edit/hapus)
+
+### **Tahap 3: Frontend & Public View**
+**Oleh Person 3 (Frontend/Public)**
+
+Fokus membuat data tampil cantik.
+
+**Controller:** `PublicProfileController`
+
+**Method `show($username)`:** Logic untuk mencari user berdasarkan username, jika tidak ketemu -> 404
+
+**Blade Templates:**
+- Gunakan Tailwind CSS Grid untuk responsivitas (1 kolom di HP, 3 kolom di Laptop)
+- Desain kartu (Card) untuk portofolio yang clickable
+
+---
+
+## 7. 📝 Checklist Aset Coding (Apa yang harus diketik?)
+
+Untuk merealisasikan ini, tim Anda harus membuat file-file spesifik ini di Laravel:
+
+### **A. Database (Migrations)**
+- [ ] `create_profiles_table`
+- [ ] `create_portfolios_table` 
+- [ ] `create_skills_table`
+- [ ] `create_skill_user_table`
+
+### **B. Models (Eloquent)**
+- [ ] `App\Models\Profile.php` (isi `$fillable` dan function `user()`)
+- [ ] `App\Models\Portfolio.php` (isi relasi `belongsTo User`)
+- [ ] `App\Models\Skill.php` (isi relasi `belongsToMany User`)
+
+### **C. Logic (Livewire/Controllers)**
+- [ ] `app/Http/Livewire/Portfolio/Manager.php` (Logic CRUD utama)
+- [ ] `app/Http/Livewire/Skill/Selector.php` (Logic memilih skill)
+- [ ] `app/Http/Controllers/ProfileController.php` (Logic menampilkan halaman publik)
+
+### **D. Views (Blade)**
+- [ ] `resources/views/livewire/portfolio/manager.blade.php` (Form input)
+- [ ] `resources/views/public/profile-show.blade.php` (Halaman akhir portofolio)
+
+---
+
 ## 🎉 Selesai!
 
 Dokumen ini akan terus diperbarui seiring bertambahnya fitur.  
