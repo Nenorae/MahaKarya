@@ -18,7 +18,7 @@ Kita **HANYA** menggunakan **Laravel Sail (Docker)**.
 Dilarang memakai Herd, Valet, XAMPP, Laragon, atau environment lainnya.
 
 **Alasan:**  
-Lingkungan Sail menjamin semua device identik dan bebas bug *“di laptop saya jalan”*.
+Lingkungan Sail menjamin semua device identik dan bebas bug *"di laptop saya jalan"*.
 
 ### **2. `main` Adalah Sakral**
 Branch `main` adalah **Master Copy**.  
@@ -47,11 +47,9 @@ Kode tidak boleh masuk `main` sebelum:
 
 > Perintah Sail hampir identik di semua OS.
 
----
-
 ### 🐧 **Untuk Pengguna Ubuntu (Linux)**
 
-Disarankan membuat alias Sail (lihat `MahaKarya-Setup-Guide.md`, langkah 6).
+Disarankan membuat alias Sail.
 
 Menyalakan lingkungan:
 
@@ -72,8 +70,6 @@ Mematikan lingkungan:
 ```bash
 sail down
 ```
-
----
 
 ### 🪟 **Untuk Pengguna Windows**
 
@@ -107,8 +103,6 @@ sail down
 
 Alur ini harus diikuti setiap hari.
 
----
-
 ### **Langkah 1: Memulai Hari / Mengerjakan Tugas Baru**
 
 Selalu mulai dari `main` yang paling terbaru.
@@ -125,8 +119,6 @@ sail artisan migrate
 sail composer install
 sail npm install
 ```
-
----
 
 ### **Langkah 2: Membuat Branch Baru**
 
@@ -147,8 +139,6 @@ Contoh:
 - `perbaikan/validasi-login`
 - `refaktor/profile-controller`
 
----
-
 ### **Langkah 3: Ngoding (Coding & Committing)**
 
 Commit sering. Jangan commit besar sekaligus.
@@ -160,13 +150,11 @@ git commit -m "Tambah validasi untuk form portofolio"
 ```
 
 **Contoh commit yang benar:**
-- ✔️ Tambah validasi untuk form portofolio  
-- ✔️ Perbaiki tampilan tombol hapus skill  
+- ✅ Tambah validasi untuk form portofolio  
+- ✅ Perbaiki tampilan tombol hapus skill  
 - ❌ wip  
 - ❌ beberapa perbaikan  
 - ❌ fix  
-
----
 
 ### **Langkah 4: Push ke GitHub**
 
@@ -182,18 +170,14 @@ Push selanjutnya:
 git push
 ```
 
----
-
 ### **Langkah 5: Membuat Pull Request (PR)**
 
-1. Buka repository MahaKarya di GitHub.
-2. Jika ada banner kuning “recent pushes”, klik **Compare & pull request**.
+1. Buka repository MahaKarya di GitHub
+2. Jika ada banner kuning "recent pushes", klik **Compare & pull request**
 3. Isi judul PR — contoh: **Fitur: CRUD Portofolio**
-4. Isi deskripsi PR.
-5. Pilih reviewer (1–2 orang).
-6. Klik **Create pull request**.
-
----
+4. Isi deskripsi PR
+5. Pilih reviewer (1–2 orang)
+6. Klik **Create pull request**
 
 ### **Langkah 6: Review & Merge**
 
@@ -211,47 +195,70 @@ git push
 
 ## 4. 👥 Pembagian Tugas Awal (Vertical Slices)
 
-### **Person 1 — Lead / Arsitek**
-**Nama:** `[Isi Nama Anda]`
+### **Person 1: Lead & Database Architect**
 
-**Tugas Inti:**
-- Membuat semua file Migration & Model (Profile, Portfolio, Skill, skill_user)
-- Menentukan relasi antar Model
-- Modifikasi halaman Profil bawaan Jetstream (bio, jurusan, angkatan)
+**Fokus:** Integritas Data & Profil Pengguna Inti  
+**Branch Awal:** `fitur/database-dan-profil-core`
 
-**Tanggung Jawab:**
-- Menjaga branch `main`
-- Final merge semua PR
-- Memastikan migrasi berjalan
+**Tugas:**
+- **Arsitektur Database (Migrations):**
+  - Buat Model & Migration untuk:
+    - Profile: user_id (FK), bio (text, nullable), avatar (string, nullable), jurusan (string), angkatan (year/integer)
+    - Portfolio: user_id (FK), title, description (text), link (string, nullable), image (string)
+    - Skill: name (string, unique)
+    - skill_user (Pivot Table): user_id (FK), skill_id (FK). Gunakan constraint onDelete('cascade')
 
----
+- **Eloquent Relationships (Models):**
+  - Definisikan relasi di file Model PHP agar Person 2 & 3 bisa langsung memanggilnya
+  - User: hasOne(Profile), hasMany(Portfolio), belongsToMany(Skill)
+  - Portfolio & Profile: belongsTo(User)
 
-### **Person 2 — Fitur Portofolio**
-**Nama:** `[Isi Nama Anggota 1]`
+- **Modifikasi Jetstream/Fortify (Update Profile):**
+  - Modifikasi `app/Actions/Fortify/UpdateUserProfileInformation.php`
+  - Tambahkan validasi dan logika simpan untuk field bio, jurusan, dan angkatan
+  - Edit view `resources/views/profile/update-profile-information-form.blade.php` untuk menambah input field tersebut
 
-**Tugas Inti:**
-- Membuat Livewire Component `ManagePortfolios`
-- CRUD lengkap Portofolio
-- File Upload gambar portofolio (WithFileUploads)
+### **Person 2: Portfolio Manager (Backend Logic Heavy)**
 
-**Tanggung Jawab:**
-- Fitur portofolio dari A-Z
+**Fokus:** CRUD Kompleks & File Handling  
+**Branch Awal:** `fitur/crud-portfolio-livewire`
 
----
+**Tugas:**
+- **Livewire Component (ManagePortfolios):**
+  - Gunakan `php artisan make:livewire ManagePortfolios`
+  - Jangan gunakan Resource Controller biasa. Kita pakai Single Page Component di dashboard
 
-### **Person 3 — Fitur Publik & Keahlian**
-**Nama:** `[Isi Nama Anggota 2]`
+- **File Upload System:**
+  - Implementasikan trait `use WithFileUploads`
+  - Pastikan validasi gambar: `image|max:1024` (1MB)
+  - Gunakan `$this->image->store('portfolios', 'public')` untuk menyimpan fisik file
+  - **Penting:** Jangan lupa buat symlink di server (`sail artisan storage:link`) agar gambar muncul
 
-**Tugas Inti:**
-- Membuat Livewire `ManageSkills` (Many-to-Many CRUD)
-- Membuat `PublicProfileController`
-- Membuat halaman profil publik (`/username`) untuk menampilkan:
-  - bio
-  - portfolio
-  - skills
+- **CRUD State Management:**
+  - Gunakan property publik `$title`, `$description`, `$link`, `$image` untuk binding ke form
+  - Buat fungsi `resetInputFields()` untuk membersihkan form setelah submit
+  - Gunakan Modal (Alpine.js atau Livewire boolean) untuk form Tambah/Edit agar UX lebih mulus tanpa pindah halaman
 
-**Tanggung Jawab:**
-- Tampilan publik & fitur skill
+### **Person 3: Public Facade & Relations Manager**
+
+**Fokus:** Many-to-Many Logic & Public Presentation  
+**Branch Awal:** `fitur/skills-dan-public-view`
+
+**Tugas:**
+- **Livewire Component (ManageSkills):**
+  - Implementasi Many-to-Many
+  - Logic Tambah: Saat user mengetik skill (misal "Laravel"), cek dulu di DB `Skill::firstOrCreate(...)`. Jangan buat duplikat nama skill di tabel master
+  - Logic Attach: Gunakan `$user->skills()->syncWithoutDetaching($skill->id)` agar user tidak punya skill ganda yang sama
+
+- **Public Controller (PublicProfileController):**
+  - Gunakan Route Model Binding pada kolom username
+  - Performance: Gunakan Eager Loading untuk mencegah N+1 Query
+  - Contoh: `$user->load(['profile', 'portfolios', 'skills'])`
+
+- **Public View (Blade):**
+  - Buat tampilan profil yang cantik dan responsif
+  - Tampilkan Avatar, Bio, Daftar Skill (sebagai badges), dan Grid Portofolio
+  - Pastikan layout Mobile-Friendly (gunakan class Tailwind `grid-cols-1 md:grid-cols-3`)
 
 ---
 
