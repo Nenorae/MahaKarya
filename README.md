@@ -1,383 +1,332 @@
-# 📖 Buku Panduan & Alur Kerja Tim Proyek MahaKarya
+# 🚀 Buku Panduan Lengkap Proyek MahaKarya
 
-Selamat datang di tim! Dokumen ini adalah **"Kitab Suci"** kita.
-
-Tujuan dokumen ini adalah untuk menstandardisasi cara kita bekerja agar:
-- tidak terjadi konflik,
-- kode tetap bersih,
-- semua orang bisa bekerja dengan nyaman.
-
-Semua anggota tim **WAJIB** membaca dan mengikuti aturan ini.
+Dokumen ini adalah **"Kitab Suci"** tim yang berisi panduan instalasi dan alur kerja standar. Semua anggota tim **WAJIB** membaca dan mengikuti aturan ini.
 
 ---
 
-## 1. 🎯 Filosofi Utama (Aturan Emas)
+## 📋 Prasyarat (Wajib Install Dulu)
 
-### **1. Satu Lingkungan**
-Kita **HANYA** menggunakan **Laravel Sail (Docker)**.  
-Dilarang memakai Herd, Valet, XAMPP, Laragon, atau environment lainnya.
+Sebelum mulai, pastikan laptop kalian sudah terinstall:
 
-**Alasan:**  
-Lingkungan Sail menjamin semua device identik dan bebas bug *"di laptop saya jalan"*.
+1. **Docker Desktop**
+   - Pastikan statusnya **"Engine Running"** (Hijau)
+   - **Pengguna Windows:** Pastikan settingan *Use WSL 2 based engine* dicentang di settings Docker
 
-### **2. `main` Adalah Sakral**
-Branch `main` adalah **Master Copy**.  
-Kode di `main` harus:
-- stabil,
-- bisa berjalan,
-- sudah di-review.
+2. **Git**
 
-### **3. Dilarang Commit ke `main`**
-Semua pekerjaan **WAJIB** dilakukan dalam branch.
-
-### **4. Satu Fitur = Satu Branch**
-Contoh:
-- `fitur/crud-portfolio`
-- `perbaikan/validasi-login`
-- `refaktor/profile-controller`
-
-### **5. Review Dulu, Baru Merge**
-Kode tidak boleh masuk `main` sebelum:
-- dibuat Pull Request (PR),
-- direview dan di-approve oleh setidaknya 1 anggota tim.
+3. **VS Code** (Disarankan)
 
 ---
 
-## 2. ⚙️ Standar Lingkungan (Cara Pakai Sail)
+## 🛠️ Panduan Instalasi Proyek
 
-> Perintah Sail hampir identik di semua OS.
-
-### 🐧 **Untuk Pengguna Ubuntu (Linux)**
-
-Disarankan membuat alias Sail.
-
-Menyalakan lingkungan:
+### Langkah 1: Clone & Persiapan File
 
 ```bash
+# 1. Clone repository
+git clone https://github.com/username-kalian/mahakarya.git
+
+# 2. Masuk ke folder proyek
+cd mahakarya
+
+# 3. Duplikat file environment
+# Windows:
+copy .env.example .env
+# Mac/Linux/Git Bash:
+cp .env.example .env
+```
+
+### Langkah 2: Instalasi Vendor dengan Docker
+
+**🐧 Linux/macOS:**
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install --ignore-platform-reqs
+```
+
+**🪟 Windows (PowerShell):**
+```powershell
+docker run --rm ^
+    -v "%cd%":/var/www/html ^
+    -w /var/www/html ^
+    laravelsail/php82-composer:latest ^
+    composer install --ignore-platform-reqs
+```
+
+### Langkah 3: Menyalakan Sail
+
+```bash
+./vendor/bin/sail up -d
+```
+
+> **Note:** Proses pertama kali akan lama (5-10 menit) karena mendownload image.
+
+### Langkah 4: Setup Aplikasi
+
+```bash
+# 1. Generate Application Key
+./vendor/bin/sail artisan key:generate
+
+# 2. Migrasi Database
+./vendor/bin/sail artisan migrate
+
+# 3. (Opsional) Data dummy
+./vendor/bin/sail artisan db:seed
+```
+
+### Langkah 5: Setup Frontend
+
+```bash
+# 1. Install Node modules
+./vendor/bin/sail npm install
+
+# 2. Jalankan dev server (biarkan terminal terbuka)
+./vendor/bin/sail npm run dev
+```
+
+### ✅ Selesai!
+
+Buka browser dan akses: **http://localhost**
+
+---
+
+## ⚙️ Standar Lingkungan Development
+
+### **Filosofi Utama: Satu Lingkungan**
+Kita **HANYA** menggunakan **Laravel Sail (Docker)**. Dilarang memakai Herd, Valet, XAMPP, Laragon, atau environment lainnya.
+
+### **Perintah Sail Standar**
+
+```bash
+# Menyalakan lingkungan
 sail up -d
-```
 
-Menjalankan perintah:
+# Perintah Laravel
+sail artisan [command]
+sail composer [command]
 
-```bash
-sail artisan ...
-sail composer ...
-sail npm ...
-```
+# Perintah Frontend
+sail npm [command]
+sail npm run dev
 
-Mematikan lingkungan:
-
-```bash
+# Mematikan lingkungan
 sail down
 ```
 
-### 🪟 **Untuk Pengguna Windows**
-
-**Prasyarat wajib:**
-- Docker Desktop **harus** menyala
-- Laravel Herd **harus dimatikan** (Herd berebut port 80 & 3306 dengan Sail)
-
-Menyalakan lingkungan:
-
-```bash
-sail up -d
-```
-
-Menjalankan perintah:
-
-```bash
-sail artisan ...
-sail composer ...
-sail npm ...
-```
-
-Mematikan lingkungan:
-
-```bash
-sail down
-```
+**🪟 Windows:** Pastikan Docker Desktop menyala dan Laravel Herd **dimatikan** (berebut port 80 & 3306).
 
 ---
 
-## 3. 🔄 Alur Kerja Wajib Git (Pull, Branch, Commit, Push, Merge)
+## 🔄 Alur Kerja Git (WAJIB DIIKUTI)
 
-Alur ini harus diikuti setiap hari.
+### **Aturan Emas:**
+- `main` adalah branch sakral (harus stabil)
+- **Dilarang** commit langsung ke `main`
+- Satu fitur = satu branch
+- Review dulu, baru merge
 
-### **Langkah 1: Memulai Hari / Mengerjakan Tugas Baru**
+### **Langkah Harian:**
 
-Selalu mulai dari `main` yang paling terbaru.
-
+#### 1. Memulai Hari / Tugas Baru
 ```bash
 # 1. Pindah ke main
 git checkout main
 
-# 2. Ambil update terbaru dari GitHub
+# 2. Ambil update terbaru
 git pull origin main
 
-# 3. Update migrasi / dependensi (jika ada perubahan)
+# 3. Update dependensi (jika ada perubahan)
 sail artisan migrate
 sail composer install
 sail npm install
 ```
 
-### **Langkah 2: Membuat Branch Baru**
-
-Branch baru selalu dibuat dari `main` yang bersih.
-
+#### 2. Membuat Branch Baru
 ```bash
 git checkout -b <nama-branch-anda>
 ```
 
-**Format penamaan branch (WAJIB):**
+**Format penamaan branch:**
 - Fitur baru → `fitur/<deskripsi-singkat>`
 - Perbaikan bug → `perbaikan/<deskripsi-singkat>`
 - Refaktor → `refaktor/<deskripsi-singkat>`
 
-Contoh:
+**Contoh:**
 - `fitur/crud-portfolio`
-- `fitur/halaman-profil-publik`
 - `perbaikan/validasi-login`
 - `refaktor/profile-controller`
 
-### **Langkah 3: Ngoding (Coding & Committing)**
-
-Commit sering. Jangan commit besar sekaligus.
-
+#### 3. Ngoding & Committing
 ```bash
-git status
 git add .
 git commit -m "Tambah validasi untuk form portofolio"
 ```
 
-**Contoh commit yang benar:**
-- ✅ Tambah validasi untuk form portofolio  
-- ✅ Perbaiki tampilan tombol hapus skill  
-- ❌ wip  
-- ❌ beberapa perbaikan  
-- ❌ fix  
+**Contoh commit message:**
+- ✅ "Tambah validasi untuk form portofolio"
+- ✅ "Perbaiki tampilan tombol hapus skill"
+- ❌ "wip", "beberapa perbaikan", "fix"
 
-### **Langkah 4: Push ke GitHub**
-
-Push pertama kali:
-
+#### 4. Push ke GitHub
 ```bash
+# Push pertama
 git push -u origin fitur/crud-portfolio
-```
 
-Push selanjutnya:
-
-```bash
+# Push selanjutnya
 git push
 ```
 
-### **Langkah 5: Membuat Pull Request (PR)**
+#### 5. Membuat Pull Request (PR)
+1. Buka repository di GitHub
+2. Klik **Compare & pull request**
+3. Isi judul: **Fitur: CRUD Portofolio**
+4. Pilih reviewer (1-2 orang)
+5. Klik **Create pull request**
 
-1. Buka repository MahaKarya di GitHub
-2. Jika ada banner kuning "recent pushes", klik **Compare & pull request**
-3. Isi judul PR — contoh: **Fitur: CRUD Portofolio**
-4. Isi deskripsi PR
-5. Pilih reviewer (1–2 orang)
-6. Klik **Create pull request**
+#### 6. Review & Merge
+**Reviewer:** 
+- Buka PR → **Files changed**
+- Beri komentar jika ada masalah
+- **Approve** jika sudah oke
 
-### **Langkah 6: Review & Merge**
-
-#### Untuk Reviewer:
-- Buka PR → tab **Files changed**
-- Jika ada masalah → beri komentar
-- Jika sudah oke → **Approve**
-
-#### Untuk Pembuat PR (Setelah Approved):
-- Klik **Squash and merge**
-- Klik **Confirm**
-- Klik **Delete branch**
+**Pembuat PR (setelah approved):**
+- **Squash and merge**
+- **Delete branch**
 
 ---
 
-## 4. 👥 Pembagian Tugas Awal (Vertical Slices)
+## 👥 Pembagian Tugas & Tanggung Jawab
 
 ### **Person 1: Lead & Database Architect**
-
-**Fokus:** Integritas Data & Profil Pengguna Inti  
-**Branch Awal:** `fitur/database-dan-profil-core`
+**Branch:** `fitur/database-dan-profil-core`
 
 **Tugas:**
-- **Arsitektur Database (Migrations):**
-  - Buat Model & Migration untuk:
-    - Profile: user_id (FK), bio (text, nullable), avatar (string, nullable), jurusan (string), angkatan (year/integer)
-    - Portfolio: user_id (FK), title, description (text), link (string, nullable), image (string)
-    - Skill: name (string, unique)
-    - skill_user (Pivot Table): user_id (FK), skill_id (FK). Gunakan constraint onDelete('cascade')
+- ✅ **Migrations:** Profile, Portfolio, Skill, skill_user (pivot)
+- ✅ **Models:** Eloquent relationships (User → Profile, Portfolio, Skill)
+- ✅ **Profile System:** Modifikasi Jetstream/Fortify untuk field tambahan (bio, jurusan, angkatan)
 
-- **Eloquent Relationships (Models):**
-  - Definisikan relasi di file Model PHP agar Person 2 & 3 bisa langsung memanggilnya
-  - User: hasOne(Profile), hasMany(Portfolio), belongsToMany(Skill)
-  - Portfolio & Profile: belongsTo(User)
-
-- **Modifikasi Jetstream/Fortify (Update Profile):**
-  - Modifikasi `app/Actions/Fortify/UpdateUserProfileInformation.php`
-  - Tambahkan validasi dan logika simpan untuk field bio, jurusan, dan angkatan
-  - Edit view `resources/views/profile/update-profile-information-form.blade.php` untuk menambah input field tersebut
-
-### **Person 2: Portfolio Manager (Backend Logic Heavy)**
-
-**Fokus:** CRUD Kompleks & File Handling  
-**Branch Awal:** `fitur/crud-portfolio-livewire`
+### **Person 2: Portfolio Manager**
+**Branch:** `fitur/crud-portfolio-livewire`
 
 **Tugas:**
-- **Livewire Component (ManagePortfolios):**
-  - Gunakan `php artisan make:livewire ManagePortfolios`
-  - Jangan gunakan Resource Controller biasa. Kita pakai Single Page Component di dashboard
+- ✅ **Livewire Component:** `ManagePortfolios` dengan CRUD lengkap
+- ✅ **File Upload:** Handling gambar portfolio dengan validasi
+- ✅ **Storage:** Setup `storage:link` dan penyimpanan file
 
-- **File Upload System:**
-  - Implementasikan trait `use WithFileUploads`
-  - Pastikan validasi gambar: `image|max:1024` (1MB)
-  - Gunakan `$this->image->store('portfolios', 'public')` untuk menyimpan fisik file
-  - **Penting:** Jangan lupa buat symlink di server (`sail artisan storage:link`) agar gambar muncul
-
-- **CRUD State Management:**
-  - Gunakan property publik `$title`, `$description`, `$link`, `$image` untuk binding ke form
-  - Buat fungsi `resetInputFields()` untuk membersihkan form setelah submit
-  - Gunakan Modal (Alpine.js atau Livewire boolean) untuk form Tambah/Edit agar UX lebih mulus tanpa pindah halaman
-
-### **Person 3: Public Facade & Relations Manager**
-
-**Fokus:** Many-to-Many Logic & Public Presentation  
-**Branch Awal:** `fitur/skills-dan-public-view`
+### **Person 3: Public Facade & Relations**
+**Branch:** `fitur/skills-dan-public-view`
 
 **Tugas:**
-- **Livewire Component (ManageSkills):**
-  - Implementasi Many-to-Many
-  - Logic Tambah: Saat user mengetik skill (misal "Laravel"), cek dulu di DB `Skill::firstOrCreate(...)`. Jangan buat duplikat nama skill di tabel master
-  - Logic Attach: Gunakan `$user->skills()->syncWithoutDetaching($skill->id)` agar user tidak punya skill ganda yang sama
-
-- **Public Controller (PublicProfileController):**
-  - Gunakan Route Model Binding pada kolom username
-  - Performance: Gunakan Eager Loading untuk mencegah N+1 Query
-  - Contoh: `$user->load(['profile', 'portfolios', 'skills'])`
-
-- **Public View (Blade):**
-  - Buat tampilan profil yang cantik dan responsif
-  - Tampilkan Avatar, Bio, Daftar Skill (sebagai badges), dan Grid Portofolio
-  - Pastikan layout Mobile-Friendly (gunakan class Tailwind `grid-cols-1 md:grid-cols-3`)
+- ✅ **Skills System:** Many-to-many dengan autocomplete
+- ✅ **Public Profile:** Controller dan view untuk profil publik
+- ✅ **Frontend:** Tampilan responsif dengan Tailwind CSS
 
 ---
 
-## 5. 📋 Daftar Fitur Wajib (Functional Requirements)
+## 📋 Daftar Fitur Wajib
 
-Kita bagi menjadi dua sisi: Panel Admin (Dashboard User) dan Sisi Publik (Pengunjung).
-
-### **A. Sisi Dashboard (Area Login User)**
-Ini adalah tempat "dapur" di mana user mengelola konten mereka.
-
-#### **Autentikasi & Keamanan**
-- ✅ Login, Register, Logout (bisa pakai Laravel Breeze/Jetstream)
-- ✅ Reset Password (penting jika user lupa sandi)
-
-#### **Manajemen Profil Diri**
-- ✅ Update Avatar (foto profil)
-- ✅ Update Bio Ringkas, Jurusan, Angkatan, Link Sosmed (LinkedIn, GitHub)
-
-#### **Manajemen Portofolio (CRUD)**
-- ✅ **Create**: Upload thumbnail gambar, judul, deskripsi, link demo/repo
-- ✅ **Read**: Melihat daftar portofolio sendiri dalam bentuk tabel/grid
-- ✅ **Update**: Edit salah satu data jika ada typo
-- ✅ **Delete**: Hapus portofolio yang sudah usang
-
-#### **Manajemen Skill (Tagging System)**
-- ✅ Menambah skill (misal: "Laravel", "Flutter", "Cisco")
-- ✅ Sistem autocomplete (agar tidak ada user menulis "ReactJS" dan "React.js" sebagai dua hal berbeda)
+### **A. Dashboard (Area Login User)**
+- ✅ **Autentikasi:** Login, Register, Reset Password
+- ✅ **Profile Management:** Update avatar, bio, jurusan, angkatan, social links
+- ✅ **Portfolio CRUD:** Create, read, update, delete portfolio projects
+- ✅ **Skills Management:** Tagging system dengan autocomplete
 
 ### **B. Sisi Publik (Halaman Profil)**
-Ini adalah "etalase" yang akan dilihat orang lain.
-
-#### **Landing Page Sederhana**
-- ✅ Halaman depan yang menjelaskan "Apa itu MahaKarya?"
-- ⚠️ (Opsional) Daftar user terbaru atau fitur pencarian mahasiswa
-
-#### **Halaman Detail Profil (The "MahaKarya" Page)**
-- ✅ URL yang cantik: `mahakarya.test/u/ganendra` (bukan `mahakarya.test/user/12`)
-- ✅ Header berisi Foto, Nama, Jurusan, dan Bio
-- ✅ Daftar Skill (tampil sebagai badges atau pills)
-- ✅ Grid Portofolio: Tampilan kartu-kartu proyek yang rapi
-- ✅ Detail Proyek (Modal/Page): Saat kartu diklik, muncul detail lengkap + gambar besar
+- ✅ **Landing Page:** Penjelasan "Apa itu MahaKarya?"
+- ✅ **Public Profile:** URL cantik (`mahakarya.test/u/username`)
+- ✅ **Portfolio Display:** Grid portofolio yang responsive
+- ✅ **Skills Display:** Badges/tags untuk keahlian
 
 ---
 
-## 6. 🛠️ Langkah Realisasi Teknis (Technical Roadmap)
+## 🛠️ Roadmap Teknis
 
-Berdasarkan pembagian tim yang sudah Anda buat sebelumnya, berikut adalah aset teknis yang harus dibuat coding-nya.
-
-### **Tahap 1: Database & Model (Fondasi)**
-**Oleh Person 1 (Database Architect)**
-
-Kita perlu membuat "wadah" datanya dulu.
-
-**ERD (Entity Relationship Diagram):** Pastikan relasi tabel benar
+### **Tahap 1: Database & Model (Person 1)**
 ```
+ERD:
 users 1 --- 1 profiles
 users 1 --- N portfolios  
-users N --- N skills (pakai pivot table skill_user)
+users N --- N skills (pivot: skill_user)
 ```
 
-**Factory & Seeder:** Buat data palsu (dummy data) sebanyak 10 user lengkap dengan portofolio. Ini PENTING agar Person 3 bisa mendesain tampilan tanpa menunggu Person 2 selesai membuat fitur input.
+**Migrations:**
+- `create_profiles_table`
+- `create_portfolios_table`
+- `create_skills_table` 
+- `create_skill_user_table`
 
-### **Tahap 2: Backend Logic & Dashboard**
-**Oleh Person 2 (Backend/CRUD)**
+### **Tahap 2: Backend & Dashboard (Person 2)**
+- Livewire Components: `ManagePortfolios`, `CreatePortfolio`
+- Image handling dengan Laravel Storage
+- Route grouping dengan middleware auth
 
-Fokus membuat fitur agar data bisa masuk ke database.
-
-**Route Grouping:** Pisahkan route publik dan route yang butuh login (`middleware('auth')`)
-
-**Image Handling (Laravel Storage):**
-- Setting `config/filesystems.php`
-- Pastikan folder `storage/app/public` bisa diakses (`php artisan storage:link`)
-
-**Livewire Components:**
-- `CreatePortfolio.php` (Form input + upload gambar)
-- `ListPortfolio.php` (Tabel manajemen + tombol edit/hapus)
-
-### **Tahap 3: Frontend & Public View**
-**Oleh Person 3 (Frontend/Public)**
-
-Fokus membuat data tampil cantik.
-
-**Controller:** `PublicProfileController`
-
-**Method `show($username)`:** Logic untuk mencari user berdasarkan username, jika tidak ketemu -> 404
-
-**Blade Templates:**
-- Gunakan Tailwind CSS Grid untuk responsivitas (1 kolom di HP, 3 kolom di Laptop)
-- Desain kartu (Card) untuk portofolio yang clickable
+### **Tahap 3: Frontend & Public (Person 3)**
+- Controller: `PublicProfileController` dengan method `show($username)`
+- Blade templates dengan Tailwind CSS Grid
+- Many-to-many skill management
 
 ---
 
-## 7. 📝 Checklist Aset Coding (Apa yang harus diketik?)
+## 📝 Checklist Aset Coding
 
-Untuk merealisasikan ini, tim Anda harus membuat file-file spesifik ini di Laravel:
+### **Database & Models**
+- [ ] `create_profiles_table` migration
+- [ ] `create_portfolios_table` migration
+- [ ] `create_skills_table` migration
+- [ ] `create_skill_user_table` migration
+- [ ] `Profile.php` model dengan relationships
+- [ ] `Portfolio.php` model dengan relationships  
+- [ ] `Skill.php` model dengan relationships
 
-### **A. Database (Migrations)**
-- [ ] `create_profiles_table`
-- [ ] `create_portfolios_table` 
-- [ ] `create_skills_table`
-- [ ] `create_skill_user_table`
+### **Livewire & Controllers**
+- [ ] `ManagePortfolios.php` Livewire component
+- [ ] `ManageSkills.php` Livewire component
+- [ ] `PublicProfileController.php` controller
 
-### **B. Models (Eloquent)**
-- [ ] `App\Models\Profile.php` (isi `$fillable` dan function `user()`)
-- [ ] `App\Models\Portfolio.php` (isi relasi `belongsTo User`)
-- [ ] `App\Models\Skill.php` (isi relasi `belongsToMany User`)
-
-### **C. Logic (Livewire/Controllers)**
-- [ ] `app/Http/Livewire/Portfolio/Manager.php` (Logic CRUD utama)
-- [ ] `app/Http/Livewire/Skill/Selector.php` (Logic memilih skill)
-- [ ] `app/Http/Controllers/ProfileController.php` (Logic menampilkan halaman publik)
-
-### **D. Views (Blade)**
-- [ ] `resources/views/livewire/portfolio/manager.blade.php` (Form input)
-- [ ] `resources/views/public/profile-show.blade.php` (Halaman akhir portofolio)
+### **Views & Frontend**
+- [ ] `manager.blade.php` (dashboard portfolio)
+- [ ] `profile-show.blade.php` (halaman publik)
+- [ ] Update `update-profile-information-form.blade.php`
 
 ---
 
-## 🎉 Selesai!
+## 🆘 Troubleshooting
 
-Dokumen ini akan terus diperbarui seiring bertambahnya fitur.  
-Patuhilah panduan ini — demi workflow yang sehat, kode yang bersih, dan tim yang bahagia.
+**Q: Error `port is already allocated`?**  
+A: Matikan **XAMPP/Laragon/Herd** karena berebut port 80 & 3306 dengan Docker.
+
+**Q: Perintah `./vendor/bin/sail` terlalu panjang?**  
+A: Buat alias:
+- **Windows:** `alias sail='sh vendor/bin/sail'`
+- **Linux/Mac:** `alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'`
+
+**Q: Database error / Connection refused?**  
+A: Coba `./vendor/bin/sail down -v` lalu `up` lagi.
+
+**Q: Gambar tidak muncul?**  
+A: Pastikan sudah menjalankan `sail artisan storage:link`
+
+---
+
+## 🎯 Filosofi Tim
+
+1. **Konsistensi:** Semua pakai Sail, tidak ada environment lain
+2. **Kolaborasi:** Branch, PR, review - setiap fitur
+3. **Kualitas:** Kode di `main` harus stabil dan ter-test
+4. **Komunikasi:** Saling review dan bantu troubleshooting
+
+---
+
+## 🚀 Mulai Bekerja!
+
+1. **Pilih tugas** sesuai pembagian di atas
+2. **Ikuti alur Git** yang sudah ditentukan  
+3. **Commit sering** dengan pesan yang jelas
+4. **Buat PR** untuk setiap fitur
+5. **Review** kode teman sekelas
+
+**Selamat berkoding! 🎉**
