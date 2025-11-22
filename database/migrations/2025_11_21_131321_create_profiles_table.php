@@ -13,11 +13,26 @@ return new class extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->unique()->onDelete('cascade');
+
+            // Foreign Key ke Users
+            // onDelete('cascade') artinya jika User dihapus, Profilenya ikut terhapus otomatis
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
+            $table->string('headline')->nullable(); // Contoh: "Informatics Student at PENS"
             $table->text('bio')->nullable();
-            $table->string('avatar')->nullable();
-            $table->string('jurusan');
-            $table->year('angkatan'); 
+
+            // Path penyimpanan gambar
+            $table->string('avatar_path', 2048)->nullable();
+            $table->string('cover_path', 2048)->nullable();
+
+            // Data Akademik
+            $table->string('institution')->nullable(); // Kampus
+            $table->string('major')->nullable();       // Jurusan
+
+            // MySQL mendukung kolom JSON. Sangat berguna untuk menyimpan link sosmed yang dinamis
+            // Contoh isi: {"linkedin": "url...", "github": "url...", "instagram": "url..."}
+            $table->json('social_links')->nullable();
+
             $table->timestamps();
         });
     }

@@ -12,12 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('portfolios', function (Blueprint $table) {
-            $table->id();
+           $table->id();
+            
+            // Relasi ke User (Pemilik Proyek)
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
             $table->string('title');
-            $table->text('description');
-            $table->string('link')->nullable();
-            $table->string('image');
+            $table->string('slug')->unique(); // URL: /p/aplikasi-kasir-pintar
+            
+            $table->longText('description'); // Deskripsi panjang (bisa support HTML/Markdown)
+            
+            $table->string('thumbnail_path', 2048)->nullable();
+            
+            // Link ke demo atau repository
+            $table->string('demo_url')->nullable();
+            $table->string('repo_url')->nullable();
+            
+            // Status & Statistik
+            $table->boolean('is_published')->default(true);
+            $table->unsignedBigInteger('views_count')->default(0);
+            
             $table->timestamps();
         });
     }
